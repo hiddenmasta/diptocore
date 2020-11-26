@@ -1,0 +1,4 @@
+#exclude anything but source
+build/
+store/
+nbproject/
