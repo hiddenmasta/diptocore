@@ -5,13 +5,18 @@
  */
 package dipto.business.network.beans;
 
+import dipto.business.network.Client;
+import dipto.business.network.exceptions.WrongConfirmationMessageException;
+import dipto.business.network.tcpip.ClientTCP;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author anon
  */
-public class ConfirmationMessage implements Serializable{
+public class ConfirmationMessage extends PlainMessage{
     private final byte [] message_ack;
     
     public ConfirmationMessage(byte [] message_ack){
@@ -20,5 +25,19 @@ public class ConfirmationMessage implements Serializable{
 
     public byte[] getMessageID() {
         return message_ack;
+    }
+
+    @Override
+    public Serializable GetMessage() {
+        return new ConfirmationMessage(message_ack);
+    }
+
+    @Override
+    public void HandleMessage(Client client) {
+        try {
+            client.GetAcknowledgmentHandler().checkConfirmationMessageExists(message_ack);
+        } catch (WrongConfirmationMessageException ex) {
+            Logger.getLogger(ClientTCP.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

@@ -26,10 +26,14 @@ import integrity.HashGen;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
@@ -67,7 +71,7 @@ public abstract class Utility {
         return baos.toByteArray();
     }
     
-    public static void paste(String text){
+    public static void CopyTextToClipboard(String text){
         Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
         Clipboard clipboard = defaultToolkit.getSystemClipboard();
         clipboard.setContents(new StringSelection(text), null);
@@ -160,5 +164,38 @@ public abstract class Utility {
             if (!Character.isDigit(c)) return false;
         }
         return true;
+    }
+    
+    public static String GetWANIpAddress(){
+        BufferedReader input_aws = null;
+        BufferedReader input_ipify = null;
+        
+        String ip_aws = "No Internet Access";
+        String ip_ipify = "No Internet Access";
+        
+        try {
+            input_aws = new BufferedReader(new InputStreamReader(new URL("http://checkip.amazonaws.com").openStream()));
+            input_ipify = new BufferedReader(new InputStreamReader(new URL("https://api.ipify.org").openStream()));
+            
+            ip_aws = input_aws.readLine();
+            ip_ipify = input_ipify.readLine();
+            
+            input_aws.close();
+            input_ipify.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Utility.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if(input_aws != null)
+                    input_aws.close();
+                if(input_ipify != null)
+                    input_ipify.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Utility.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return !ip_aws.equals("No Internet Access") ? ip_aws : 
+               (!ip_ipify.equals("No Internet Access") ? ip_ipify : "No Internet Access");
     }
 }

@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package dipto.security;
+package dipto.security.beans;
 
 import java.io.Serializable;
 import java.security.SignedObject;

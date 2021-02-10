@@ -12,10 +12,10 @@ import java.util.ArrayList;
  *
  * @author anon
  */
-public class ChatMessagesReplica {
+public class ConversationMirror {
     private final ArrayList<String> messages;
     
-    public ChatMessagesReplica(){
+    public ConversationMirror(){
         this.messages = new ArrayList<>();
     }
     

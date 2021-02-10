@@ -5,13 +5,12 @@
  */
 package dipto.business.network;
 
-import dipto.business.network.beans.FileMessage;
-import java.io.File;
+import dipto.business.network.beans.CustomFile;
 
 /**
  *
  * @author anon
  */
 public interface IFileReceived {
-    void handleNewFile(FileMessage file);
+    void handleNewFile(CustomFile file);
 }

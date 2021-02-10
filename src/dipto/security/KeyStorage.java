@@ -44,6 +44,11 @@ import org.bouncycastle.operator.OperatorCreationException;
  * @author anon
  */
 public class KeyStorage {
+    public static final String CIPHER1_KEY = "CIPHER_KEY";
+    public static final String CIPHER2_KEY = "CIPHER2_KEY";
+    public static final String CIPHER3_KEY = "CIPHER3_KEY";
+    public static final String HMAC_KEY = "HMAC_KEY";
+    
     private KeyStore keystore;
     
     public KeyStorage() throws 
@@ -57,13 +62,17 @@ public class KeyStorage {
         /* Creation of the session keystore */
         keystore = KeyStore.getInstance("JCEKS");
         keystore.load(null, "".toCharArray());
-        
+    }
+    
+    public void PrepareSessionKeys(){
         try {
             KeysAndCertificate keys_cert = KeyGen.generateKeysAndCertificate();
             keystore.setKeyEntry("session", keys_cert.getPrk(), "".toCharArray(), new X509Certificate[]{keys_cert.getCert()});
-        } catch (OperatorCreationException | NoSuchProviderException ex) {
+        } catch (OperatorCreationException | NoSuchProviderException | 
+                KeyStoreException | NoSuchAlgorithmException | 
+                IOException | CertificateException ex) {
             Logger.getLogger(KeyStorage.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }        
     }
     
     public synchronized SecretKey getSecretKey(String alias) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException{

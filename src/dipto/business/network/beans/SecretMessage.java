@@ -5,6 +5,7 @@
  */
 package dipto.business.network.beans;
 
+import dipto.business.network.Client;
 import java.io.Serializable;
 import javax.crypto.SealedObject;
 
@@ -12,27 +13,31 @@ import javax.crypto.SealedObject;
  *
  * @author anon
  */
-public class SecretMessage implements Serializable{
+public abstract class SecretMessage implements Serializable{
     protected byte[] payload;
     
-    private String sender;
+    protected String sender;
     private SealedObject enc_payload;
     private byte[] signature;
     private byte[] iv_parameter;
-    private String plain_message;
-    private byte [] unix_time;
-    private int secondsBeforeDeletion;
+    protected String plain_message;
+    protected byte [] unix_time;
+    protected int secondsBeforeDeletion;
     
     public SecretMessage(){
     }
 
-    public SecretMessage(String sender, SealedObject plain_message, byte [] unix_time){
+    /*public SecretMessage(String sender, SealedObject plain_message, byte [] unix_time){
         super();
         this.sender = sender;
         this.enc_payload = plain_message;
         this.unix_time = unix_time;
-    }
-
+    }*/
+    
+    public abstract Serializable GetEncryptedMessage(Client client, int secondsBeforeDeletion, byte[] buffer);
+    public abstract byte[] GetPlainBytes();
+    public abstract byte[] HandleMessage(Client client, SecretMessage enc_obj);
+;
     public int getSecondsBeforeDeletion() {
         return secondsBeforeDeletion;
     }

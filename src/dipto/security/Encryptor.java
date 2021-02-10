@@ -28,6 +28,7 @@ import algos.CryptoProprieties;
 import authenticity.SignatureGen;
 import confidentiality.Encryption;
 import dipto.Utility;
+import dipto.business.network.beans.FileMessage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -42,8 +43,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 import dipto.business.network.beans.SecretMessage;
+import dipto.business.network.beans.StringMessage;
+import java.io.File;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -68,7 +73,6 @@ public class Encryptor {
         
         byte[] iv_parameter = ByteBuffer.allocate(16).putInt(message_order).array();
         
-        
         ArrayList<String> sym_algs = new ArrayList<>();
         sym_algs.add(CryptoProprieties.RECURSIVE_SYM_ALG1);
         sym_algs.add(CryptoProprieties.RECURSIVE_SYM_ALG2);
@@ -81,7 +85,20 @@ public class Encryptor {
         
         SealedObject sealed_obj = Encryption.sealedObjectMultipleEnc(3, message, sym_algs, sym_keys, iv_parameter);
         
-        SecretMessage message_to_send = new SecretMessage();
+        SecretMessage message_to_send = null;
+        
+        try {
+            message_to_send = (SecretMessage)Class.forName(message.getClass().getName()).newInstance();
+        } catch (ClassNotFoundException | InstantiationException | 
+                IllegalAccessException ex) {
+            Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        /*if(message instanceof StringMessage)
+            message_to_send = new StringMessage();
+        else if(message instanceof FileMessage)
+            message_to_send = new FileMessage();*/
+        
         message_to_send.setEnc_payload(sealed_obj);
         message_to_send.setSignature(SignatureGen.symSign(Utility.objectToByteArray(sealed_obj), CryptoProprieties.HMAC_ALG, hmac_key));
         message_to_send.setIv_parameter(iv_parameter);

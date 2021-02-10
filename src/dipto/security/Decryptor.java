@@ -45,7 +45,7 @@ import javax.crypto.SecretKey;
 public class Decryptor {
     public Decryptor(){}
     
-    public Serializable decrypt(SecretMessage message, SecretKey cipher1_key, SecretKey cipher2_key, SecretKey cipher3_key) throws 
+    public Object decrypt(SecretMessage message, SecretKey cipher1_key, SecretKey cipher2_key, SecretKey cipher3_key) throws 
     NoSuchAlgorithmException, 
     NoSuchProviderException, 
     InvalidKeyException, 
@@ -66,7 +66,7 @@ public class Decryptor {
         sym_keys.add(cipher3_key);
        
         //byte[] plain_bytes = Decryption.multipleSymDec(3, payload, sym_algs, sym_keys, message.getIv_parameter());
-        
-        return (String)Decryption.sealedObjectMultipleDec(message.getEnc_payload(), sym_keys);
+        Object obj = Decryption.sealedObjectMultipleDec(message.getEnc_payload(), sym_keys);
+        return Decryption.sealedObjectMultipleDec(message.getEnc_payload(), sym_keys);
     }
 }

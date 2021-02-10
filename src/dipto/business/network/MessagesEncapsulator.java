@@ -21,13 +21,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
  */
 package dipto.business.network;
 
-import dipto.business.network.beans.DiscardedMessage;
+import dipto.business.network.beans.MessageToDiscard;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -35,8 +33,8 @@ import java.util.logging.Logger;
  */
 public class MessagesEncapsulator {
     private final ArrayList<ArrayList<Serializable>> messages;
-    private Thread discardedMessageThread;
     private Timer timer;
+    private boolean isTimerStopped;
     
     public MessagesEncapsulator(){
         messages = new ArrayList<>();
@@ -63,45 +61,30 @@ public class MessagesEncapsulator {
     public void PeriodicallyCheckMessages(){
         timer = new Timer();
         
-        discardedMessageThread = new Thread(){
+        timer.schedule(new TimerTask() {
             @Override
-            public void run(){
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if(messages.isEmpty() == true)
-                            addMessage(new DiscardedMessage(), 0);                        
-                        
-                        NotifySelf();
-                    }
-                }, 0, 2 * 1000);
+            public void run() {
+                
+                while(isTimerStopped);
+                
+                if(messages.isEmpty() == true)
+                    addMessage(new MessageToDiscard(), 0);                        
+
+                NotifySelf();
             }
-        };
-        
-        discardedMessageThread.start();
+        }, 0, 2 * 1000);
     }
     
-    public synchronized void PauseMessageChecking(){
-        try {
-            timer.wait();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MessagesEncapsulator.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public void PauseMessageChecking(){
+        isTimerStopped = true;
     }
     
-    public synchronized void UnpauseMessageChecking(){
-        timer.notify();
+    public void UnpauseMessageChecking(){
+        isTimerStopped = false;
     }
     
     public void StopMessageChecking(){
         timer.cancel();
-        discardedMessageThread.interrupt();
-        
-        try {
-            discardedMessageThread.join();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MessagesEncapsulator.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
     private synchronized void NotifySelf(){
